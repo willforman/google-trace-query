@@ -6,7 +6,7 @@ services:
         soft: 262144
         hard: 262144
 
-  dbmate:
+  migrate:
     image: amacneil/dbmate:1
     environment:
       DATABASE_URL: "clickhouse://default@db:9000/trace"
@@ -18,5 +18,4 @@ services:
         source: ./db
         target: /db
         read_only: true
-    command: ["up"]
-
+    command: ["--wait", "up"]
