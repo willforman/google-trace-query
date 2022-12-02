@@ -6,16 +6,52 @@ services:
         soft: 262144
         hard: 262144
 
-  migrate:
-    image: amacneil/dbmate:1
+  fetch-files:
+    image: google/cloud-sdk:410.0.0-alpine
+    volumes:
+      - type: volume
+        source: files
+        target: /app/files
+      - type: bind
+        source: ./fetch-files.sh
+        target: /app/fetch-files.sh
+        read_only: true
+    working_dir: /app
+    entrypoint: ./fetch-files.sh
+    environment:
+      # TOT_FILES: 12804
+      TOT_FILES: 1
+      CLOSE_STREAM_FILENAME: "fetching-complete.txt"
+
+  insert-data:
+    build:
+      context: .
+      dockerfile: insert-data.Dockerfile
+    volumes:
+      - type: volume
+        source: files
+        target: /app/files
+      - type: bind
+        source: ./insert-data.sh
+        target: /app/insert-data.sh
+        read_only: true
+      - type: bind
+        source: ./db/
+        target: /app/db
+        read_only: true
+    working_dir: /app
+    entrypoint: ./insert-data.sh
     environment:
       DATABASE_URL: "clickhouse://default@db:9000/trace"
       DBMATE_NO_DUMP_SCHEMA: 1
+      CLOSE_STREAM_FILENAME: "fetching-complete.txt"
     depends_on:
       - db
-    volumes:
-      - type: bind
-        source: ./db
-        target: /db
-        read_only: true
-    command: ["--wait", "up"]
+
+volumes:
+  files:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: "${HOST_FILES_DIR}"

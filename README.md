@@ -5,14 +5,25 @@ It stores the dataset in a [Clickhouse](https://clickhouse.com) database, which 
 
 ### Initialize Database
 
+Before running, run this command and set `HOST_FILES_DIR` to be where on your machine you want to store the files at (they will be around 400GB).
+
+```
+tee -a .env << EOF
+HOST_FILES_DIR=<path on your machine>
+EOF
+```
+
+Now, you can run this command to initialize the database:
+
 ```
 docker compose -p google-trace up -d
 ```
 
-This does:
+This orchestrates 3 containers:
 
-1. Creates clickhouse-server instance
-1. Creates tables using a [dbmate](https://github.com/amacneil/dbmate) migration
+1. Creates an instance of our database (clickhouse), and stays running indefinitely
+1. Downloads the files from Google Cloud Storage and stores them at `HOST_FILES_DIR`
+1. Watches `HOST_FILES_DIR` and any time a new file comes in, inserts it to the database
 
 ### Query the Database
 

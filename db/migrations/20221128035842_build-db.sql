@@ -34,4 +34,4 @@ ENGINE = MergeTree
 ORDER BY start_time;
 
 -- migrate:down
-DROP TABLE resource_usage;
+DROP TABLE trace.resource_usage;
