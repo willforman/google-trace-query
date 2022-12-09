@@ -24,7 +24,7 @@ services:
       CLOSE_STREAM_FILENAME: "fetching-complete.txt"
 
   insert-data:
-    build:
+    build: # Have to install additional tools for this container
       context: .
       dockerfile: insert-data.Dockerfile
     volumes:
@@ -45,6 +45,7 @@ services:
       DATABASE_URL: "clickhouse://default@db:9000/trace"
       DBMATE_NO_DUMP_SCHEMA: 1
       CLOSE_STREAM_FILENAME: "fetching-complete.txt"
+      CLICKHOUSE_HOST: db
     depends_on:
       - db
 

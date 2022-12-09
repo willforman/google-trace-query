@@ -2,10 +2,10 @@
 CREATE TABLE trace.resource_usage (
   start_time DateTime NOT NULL,
   end_time DateTime NOT NULL, 
-  collection_ID UInt64 NOT NULL,
+  collection_id UInt64 NOT NULL,
   instance_index UInt32 NOT NULL,
-  machine_ID UInt64 NOT NULL,
-  alloc_collection_ID UInt32 NOT NULL,
+  machine_id UInt64 NOT NULL,
+  alloc_collection_id UInt32 NOT NULL,
   collection_type UInt8 NOT NULL,
   average_usage Nested
   (
