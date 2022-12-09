@@ -1,7 +1,8 @@
 #!/bin/bash
 
+# Migrate db
 dbmate --wait down
-dbmate --wait up # Migrate db
+dbmate up
 
 # If dbmate has a nonzero exit code, we don't wanna continue
 if [ $? -ne 0 ]; then
@@ -9,14 +10,17 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
+SECONDS=0
+
 # Triggers event every time a file is downloaded to `files/`
 # We trigger on `moved_to` instead of `create` because this is triggered when the download is complete by `gsutil`
 while read directory action file; do
+  file_path=files/$file
   if [ "$file" = "${CLOSE_STREAM_FILENAME}" ]; then
+    rm $file_path
+    echo "Inserting data took $(($diff / 3600)) hours, $((($diff / 60) % 60)) minutes and $(($diff % 60))"
     exit 0
   fi
-  
-  file_path=files/$file
 
   clickhouse-client \
     --host $CLICKHOUSE_HOST \

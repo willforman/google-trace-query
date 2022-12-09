@@ -5,11 +5,12 @@ It stores the dataset in a [Clickhouse](https://clickhouse.com) database, which 
 
 ### Initialize Database
 
-Before running, run this command and set `HOST_FILES_DIR` to be where on your machine you want to store the files at (they will be around 400GB).
+Before running, run this command and set `HOST_FILES_DIR` and `HOST_DATABASE_DIR` to be where on your machine you want to store all the data at (they will be around 400GB).
 
 ```
 tee -a .env << EOF
 HOST_FILES_DIR=<path on your machine>
+HOST_DATABASE_DIR=<path on your machine>
 EOF
 ```
 
