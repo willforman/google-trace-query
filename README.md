@@ -28,7 +28,7 @@ This orchestrates 3 containers:
 ### Query the Database
 
 ```
-docker run -it --rm --network google-trace_default --entrypoint clickhouse-client clickhouse/clickhouse-server --host google-trace-db-1
+docker run -it --rm --network google-trace_default --entrypoint clickhouse-client clickhouse/clickhouse-server:22-alpine --host google-trace-db-1
 ```
 
 Creates a clickhouse client to perform queries with.
