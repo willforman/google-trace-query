@@ -1,7 +1,7 @@
 -- migrate:up
 CREATE TABLE trace.resource_usage (
-  start_time DateTime,
-  end_time DateTime, 
+  start_time Int64,
+  end_time Int64, 
   collection_id UInt64,
   instance_index UInt32,
   machine_id UInt64,

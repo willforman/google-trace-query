@@ -1,5 +1,6 @@
 #!/bin/bash
 
+dbmate --wait down
 dbmate --wait up # Migrate db
 
 # If dbmate has a nonzero exit code, we don't wanna continue
@@ -43,17 +44,17 @@ while read directory action file; do
         cpu_usage_distribution,
         tail_cpu_usage_distribution
     FROM input('
-      start_time DateTime,
-      end_time DateTime, 
-      collection_id UInt64,
-      instance_index UInt32,
-      machine_id UInt64,
-      alloc_collection_id UInt32,
-      collection_type UInt8,
+      start_time Int64,
+      end_time Int64, 
+      collection_id Int64,
+      instance_index Int32,
+      machine_id Int64,
+      alloc_collection_id Int64,
+      collection_type Int64,
       average_usage Tuple(Float64, Float64),
       maximum_usage Tuple(Float64, Nullable(Float64)),
       random_sample_usage Tuple(Float64, Nullable(Float64)),
-      assigned_memory Float32,
+      assigned_memory Float64,
       page_cache_memory Float64,
       cycles_per_instruction Nullable(Float64),
       memory_accesses_per_instruction Nullable(Float64),
