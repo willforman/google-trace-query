@@ -9,6 +9,8 @@ services:
       - type: bind
         source: "${HOST_DATABASE_DIR}"
         target: "/var/lib/clickhouse"
+    ports:
+      - "${HOST_PORT}:9000"
 
   fetch-files:
     image: google/cloud-sdk:410.0.0-alpine

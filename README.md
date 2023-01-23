@@ -8,11 +8,13 @@ It stores the dataset in a [Clickhouse](https://clickhouse.com) database, which 
 Before running, run the below command to set:
 - `HOST_FILES_DIR`: where files are temporarily stored before they are inserted into the database
 - `HOST_DATABASE_DIR`: where the clickhouse database. The reason this is used is if you have an external drive that you want to store data on.
+- `HOST_PORT`: port you want to expose the database on, default is 9000 but you may want to use a different port
 
 ```
 tee -a .env << EOF
 HOST_FILES_DIR=./.data/files
 HOST_DATABASE_DIR=./.data/db
+HOST_PORT=9000
 EOF
 ```
 
