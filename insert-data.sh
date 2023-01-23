@@ -18,7 +18,7 @@ while read directory action file; do
   file_path=files/$file
   if [ "$file" = "${CLOSE_STREAM_FILENAME}" ]; then
     rm $file_path
-    echo "Inserting data took $(($diff / 3600)) hours, $((($diff / 60) % 60)) minutes and $(($diff % 60))"
+    echo "Inserting time elapsed: $(($SECONDS / 3600))h, $((($SECONDS / 60) % 60))m $(($SECONDS % 60))s"
     exit 0
   fi
 

@@ -5,13 +5,22 @@ It stores the dataset in a [Clickhouse](https://clickhouse.com) database, which 
 
 ### Initialize Database
 
-Before running, run this command and set `HOST_FILES_DIR` and `HOST_DATABASE_DIR` to be where on your machine you want to store all the data at (they will be around 400GB).
+Before running, run the below command to set:
+- `HOST_FILES_DIR`: where files are temporarily stored before they are inserted into the database
+- `HOST_DATABASE_DIR`: where the clickhouse database. The reason this is used is if you have an external drive that you want to store data on.
 
 ```
 tee -a .env << EOF
-HOST_FILES_DIR=<path on your machine>
-HOST_DATABASE_DIR=<path on your machine>
+HOST_FILES_DIR=./.data/files
+HOST_DATABASE_DIR=./.data/db
 EOF
+```
+
+By default, it stores the data in this repo at `.data` (which is gitignored). If you use this, make sure to run:
+
+```
+mkdir -p .data/files
+mkdir -p .data/db
 ```
 
 Now, you can run this command to initialize the database:

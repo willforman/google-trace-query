@@ -24,7 +24,7 @@ services:
     entrypoint: ./fetch-files.sh
     environment:
       # TOT_FILES: 12804
-      TOT_FILES: 40
+      TOT_FILES: 1
       CLOSE_STREAM_FILENAME: "fetching-complete.txt"
 
   insert-data:
