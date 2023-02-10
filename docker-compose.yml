@@ -12,31 +12,11 @@ services:
     ports:
       - "${HOST_PORT}:9000"
 
-  fetch-files:
-    image: google/cloud-sdk:410.0.0-alpine
-    volumes:
-      - type: volume
-        source: files
-        target: /app/files
-      - type: bind
-        source: ./fetch-files.sh
-        target: /app/fetch-files.sh
-        read_only: true
-    working_dir: /app
-    entrypoint: ./fetch-files.sh
-    environment:
-      # TOT_FILES: 12804
-      TOT_FILES: 1
-      CLOSE_STREAM_FILENAME: "fetching-complete.txt"
-
   insert-data:
-    build: # Have to install additional tools for this container
+    build: # Have to install dbmate for this container
       context: .
       dockerfile: insert-data.Dockerfile
     volumes:
-      - type: volume
-        source: files
-        target: /app/files
       - type: bind
         source: ./insert-data.sh
         target: /app/insert-data.sh
@@ -50,15 +30,8 @@ services:
     environment:
       DATABASE_URL: "clickhouse://default@db:9000/trace"
       DBMATE_NO_DUMP_SCHEMA: 1
-      CLOSE_STREAM_FILENAME: "fetching-complete.txt"
-      CLICKHOUSE_HOST: db
+      CLICKHOUSE_HOST: "db"
+      NUM_FILES: 12804
+      NO_STATUS: "true"
     depends_on:
       - db
-
-volumes:
-  files:
-    driver: local
-    driver_opts:
-      o: bind
-      type: none
-      device: "${HOST_FILES_DIR}"

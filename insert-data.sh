@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # Migrate db
-dbmate --wait down
-dbmate up
+dbmate --wait up
 
 # If dbmate has a nonzero exit code, we don't wanna continue
 if [ $? -ne 0 ]; then
@@ -10,22 +9,66 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-SECONDS=0
+echo "Database migration complete"
 
-# Triggers event every time a file is downloaded to `files/`
-# We trigger on `moved_to` instead of `create` because this is triggered when the download is complete by `gsutil`
-while read directory action file; do
-  file_path=files/$file
-  if [ "$file" = "${CLOSE_STREAM_FILENAME}" ]; then
-    rm $file_path
-    echo "Inserting time elapsed: $(($SECONDS / 3600))h $((($SECONDS / 60) % 60))m $(($SECONDS % 60))s"
-    exit 0
-  fi
+if [[ -z "${NO_STATUS}" ]]; then
+  CHUNK_SIZE=100 # How often we print status while inserting
+
+  num_files=$((NUM_FILES))
+  iters=$((num_files / CHUNK_SIZE - 1))
+
+  SECONDS=0
+
+  for i in $(seq 0 $iters); do
+
+    file_num_with_padding=$(printf "%010d" $i)
+    parquet_name="https://storage.googleapis.com/clusterdata_2019_a_parquet/instance_usage${file_num_with_padding}*.parquet"
+
+    clickhouse-client \
+      --host $CLICKHOUSE_HOST \
+      --query "
+      INSERT INTO trace.resource_usage
+      SETTINGS async_insert=1, wait_for_async_insert=0, async_insert_max_data_size=100000000, max_insert_threads=24, max_threads=24, async_insert_threads=24
+      SELECT
+          start_time,
+          end_time, 
+          collection_id,
+          instance_index,
+          machine_id,
+          alloc_collection_id,
+          collection_type,
+          average_usage.1,
+          average_usage.2,
+          maximum_usage.1,
+          maximum_usage.2,
+          random_sample_usage.1,
+          random_sample_usage.2,
+          assigned_memory,
+          page_cache_memory,
+          cycles_per_instruction,
+          memory_accesses_per_instruction,
+          sample_rate,
+          cpu_usage_distribution,
+          tail_cpu_usage_distribution
+      FROM s3('$parquet_name', 'Parquet')
+      "
+      
+      num_done=$((CHUNK_SIZE * (i + 1)))
+      perc_done_dec=$(echo "scale=3; $num_done / $NUM_FILES * 100" | bc)
+      perc_done=$(printf %.0f $perc_done_dec)
+      seconds_left_str=$(echo "scale=1; ($SECONDS / $num_done) * ($NUM_FILES - $num_done)" | bc)
+      seconds_left=$((${seconds_left_str%.*}))
+
+      echo "$num_done / $NUM_FILES -> $perc_done%, left: $(($seconds_left / 3600))h $((($seconds_left / 60) % 60))m $(($seconds_left % 60))s"
+  done
+else
+  echo "Not printing status"
 
   clickhouse-client \
     --host $CLICKHOUSE_HOST \
     --query "
     INSERT INTO trace.resource_usage
+    SETTINGS async_insert=1, wait_for_async_insert=0, async_insert_max_data_size=100000000, max_insert_threads=24, max_threads=24, async_insert_threads=24
     SELECT
         start_time,
         end_time, 
@@ -47,32 +90,15 @@ while read directory action file; do
         sample_rate,
         cpu_usage_distribution,
         tail_cpu_usage_distribution
-    FROM input('
-      start_time Int64,
-      end_time Int64, 
-      collection_id Int64,
-      instance_index Int32,
-      machine_id Int64,
-      alloc_collection_id Int64,
-      collection_type Int64,
-      average_usage Tuple(Float64, Float64),
-      maximum_usage Tuple(Float64, Nullable(Float64)),
-      random_sample_usage Tuple(Float64, Nullable(Float64)),
-      assigned_memory Float64,
-      page_cache_memory Float64,
-      cycles_per_instruction Nullable(Float64),
-      memory_accesses_per_instruction Nullable(Float64),
-      sample_rate Float64,
-      cpu_usage_distribution Array(Float64),
-      tail_cpu_usage_distribution Array(Float64)
-    ')
-    FORMAT Parquet
-" < $file_path
+    FROM s3('https://storage.googleapis.com/clusterdata_2019_a_parquet/instance_usage*.parquet', 'Parquet')
+    "
+fi
 
-  rm $file_path
+echo "Inserting time elapsed: $(($SECONDS / 3600))h $((($SECONDS / 60) % 60))m $(($SECONDS % 60))s"
+echo "Optimizing the table. This may take a while and use a lot of CPU + mem."
 
-  echo "Inserted ${file}"
-
-done < <(inotifywait -m files/ -e moved_to -t 60)
-
-exit 1 # If we timeout watching the directory before the end signal is sent, then something is wrong
+clickhouse-client \
+  --host $CLICKHOUSE_HOST \
+  --query "
+  OPTIMIZE TABLE trace.resource_usage FINAL
+  "
