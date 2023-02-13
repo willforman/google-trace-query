@@ -3,10 +3,11 @@
 port=$1
 cell_id=$2
 
-table_name="trace.resource_usage_$cell_id"
+table_name="resource_usage_$cell_id"
 
 clickhouse-client \
   --port $port \
+  --database trace \
   --query "
     CREATE TABLE $table_name (
       start_time Int64,
@@ -38,6 +39,7 @@ parquet_name="https://storage.googleapis.com/clusterdata_2019_${cell_id}_parquet
 
 clickhouse-client \
   --port $port \
+  --database trace \
   --query "
   INSERT INTO $table_name
   SETTINGS async_insert=1, wait_for_async_insert=0, async_insert_max_data_size=100000000, max_insert_threads=24, max_threads=24, async_insert_threads=24

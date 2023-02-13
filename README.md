@@ -33,3 +33,9 @@ arguments:
     - instance-usage
   cell id: a - h
 ```
+
+To enter a client:
+
+```
+docker run -it --rm --network host --entrypoint clickhouse-client clickhouse/clickhouse-server:22-alpine --database trace --port <db port>
+```
