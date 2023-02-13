@@ -3,44 +3,33 @@
 This repo sets up a performant on-premises system to query the [2019 Google Trace Dataset](https://github.com/google/cluster-data).
 It stores the dataset in a [Clickhouse](https://clickhouse.com) database, which was chosen because it's a OLAP database suited for this workload.
 
-### Initialize Database
+### Setup
 
-Before running, run the below command to set:
-- `HOST_FILES_DIR`: where files are temporarily stored before they are inserted into the database
-- `HOST_DATABASE_DIR`: where the clickhouse database. The reason this is used is if you have an external drive that you want to store data on.
-- `HOST_PORT`: port you want to expose the database on, default is 9000 but you may want to use a different port
+We will run Clickhouse in Docker. Choose where you want to store all the database files (`var/lib/clickhouse` in the Docker container) on your local machine. This enables:
+- persistence: if the container shuts down we can run the container again with the same files, so we don't have to insert again
+- choosing where you store the data, so you can instead store it on an external drive
 
-```
-tee -a .env << EOF
-HOST_FILES_DIR=./.data/files
-HOST_DATABASE_DIR=./.data/db
-HOST_PORT=9000
-EOF
-```
-
-By default, it stores the data in this repo at `.data` (which is gitignored). If you use this, make sure to run:
+The default is `.db` in the root of this repository:
 
 ```
-mkdir -p .data/files
-mkdir -p .data/db
+mkdir .db
 ```
 
-Now, you can run this command to initialize the database:
+Choose which port you want to expose on your host machine for the database, then start it in the background:
 
 ```
-docker compose -p google-trace up -d
+docker run -d --name google-trace-db -v <path to database dir>:/var/lib/clickhouse -p <db port>:9000 --ulimit nofile=262144:262144 clickhouse/clickhouse-server:22-alpine
 ```
 
-This orchestrates 3 containers:
-
-1. Creates an instance of our database (clickhouse), and stays running indefinitely
-1. Downloads the files from Google Cloud Storage and stores them at `HOST_FILES_DIR`
-1. Watches `HOST_FILES_DIR` and any time a new file comes in, inserts it to the database
-
-### Query the Database
+To insert data into our database, use `cmd.sh`:
 
 ```
-docker run -it --rm --network google-trace_default --entrypoint clickhouse-client clickhouse/clickhouse-server:22-alpine --host google-trace-db-1
-```
+./cmd.sh --help               
+usage: ./cmd.sh <db port> <table name> <cell id>
 
-Creates a clickhouse client to perform queries with.
+arguments:
+  db port 
+  table name:
+    - instance-usage
+  cell id: a - h
+```
