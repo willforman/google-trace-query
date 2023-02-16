@@ -29,6 +29,8 @@ clickhouse-client \
 
 script_name="/insert/$2.sh"
 
+echo "starting inserting now. there will be no printing until finished, this will take a while."
+
 SECONDS=0
 
 $script_name $1 $3

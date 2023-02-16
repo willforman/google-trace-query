@@ -25,17 +25,17 @@ clickhouse-client \
       random_sampled_usage_memory Nullable(Float64),
       assigned_memory Float32,
       page_cache_memory Float64,
-      cycles_per_instruction Nullable(Float64),
+      cycles_per_instruction Float64 DEFAULT 0,
       memory_accesses_per_instruction Nullable(Float64),
       sample_rate Float64,
       cpu_usage_distribution Array(Float64),
       tail_cpu_usage_distribution Array(Float64)
     )
     ENGINE = MergeTree
-    ORDER BY start_time;
+    ORDER BY (start_time, end_time, collection_id, machine_id, average_usage_cpus, cycles_per_instruction);
   "
 
-parquet_name="https://storage.googleapis.com/clusterdata_2019_${cell_id}_parquet/instance_usage*.parquet"
+parquet_name="https://storage.googleapis.com/clusterdata_2019_${cell_id}_parquet/instance_usage0000000000*.parquet"
 
 clickhouse-client \
   --port $port \
