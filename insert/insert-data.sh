@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e # Don't continue execution on error
+
 print_usage() {
   echo "usage: ./cmd.sh <db port> <table name> <cell id>"
   echo ""
