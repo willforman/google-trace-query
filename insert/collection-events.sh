@@ -32,7 +32,7 @@ clickhouse-client \
     ORDER BY (collection_id, collection_name, collection_logical_name, scheduling_class, priority);
   "
 
-file_name="https://storage.googleapis.com/clusterdata_2019_${cell_id}/instance_usage-*.json.gz"
+file_name="https://storage.googleapis.com/clusterdata_2019_${cell_id}/collection_events-*.json.gz"
 
 clickhouse-client \
   --port $port \
@@ -58,6 +58,6 @@ clickhouse-client \
     max_per_switch,
     CAST(ifNull(vertical_scaling, 0) AS Enum('VERTICAL_SCALING_SETTING_UNKNOWN' = 0, 'VERTICAL_SCALING_OFF', 'VERTICAL_SCALING_CONSTRAINED', 'VERTICAL_SCALING_FULLY_AUTOMATED')) AS vertical_scaling,
     CAST(ifNull(scheduler, 0) AS Enum('SCHEDULER_DEFAULT' = 0, 'SCHEDULER_BATCH')) AS scheduler
-  FROM s3('https://storage.googleapis.com/clusterdata_2019_a/collection_events-000000000000.json.gz', 'JSONEachRow')
+  FROM s3('$file_name', 'JSONEachRow')
   "
 
