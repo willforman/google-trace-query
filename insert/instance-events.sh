@@ -38,7 +38,7 @@ clickhouse-client \
 # constraint_value String,
 # constraint_relation Enum('EQUAL' = 0, 'NOT_EQUAL', 'LESS_THAN', 'GREATER_THAN', 'LESS_THAN_EQUAL', 'GREATER_THAN_EQUAL', 'PRESENT', 'NOT_PRESENT')
 
-file_name="https://storage.googleapis.com/clusterdata_2019_${cell_id}/instance_events-000000000000.json.gz"
+file_name="https://storage.googleapis.com/clusterdata_2019_${cell_id}/instance_events*.json.gz"
 
 clickhouse-client \
   --port $port \
