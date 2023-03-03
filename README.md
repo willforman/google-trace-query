@@ -42,8 +42,8 @@ docker run -it --rm --network host --entrypoint clickhouse-client clickhouse/cli
 
 ### Table Schemas
 
+#### instance_usage
 ```
-instance_usage
 ┌─name────────────────────────────┬─type──────────────────────────────┬─default_type─┬─default_expression─┐
 │ start_time                      │ DateTime('America/Los_Angeles')   │              │                    │
 │ end_time                        │ DateTime('America/Los_Angeles')   │              │                    │
@@ -69,8 +69,8 @@ instance_usage
 └─────────────────────────────────┴───────────────────────────────────┴──────────────┴────────────────────┘
 ```
 
+#### instance_events
 ```
-instance_events
 ┌─name────────────────────┬─type──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┬─default_type─┬─default_expression─┐
 │ time                    │ DateTime('America/Los_Angeles')                                                                                                                                                       │              │                    │
 │ type                    │ Enum8('SUBMIT' = 0, 'QUEUE' = 1, 'ENABLE' = 2, 'SCHEDULE' = 3, 'EVICT' = 4, 'FAIL' = 5, 'FINISH' = 6, 'KILL' = 7, 'LOST' = 8, 'UPDATE_PENDING' = 9, 'UPDATE_RUNNING' = 10)            │              │                    │
@@ -86,10 +86,11 @@ instance_events
 │ resource_request_cpus   │ Float64                                                                                                                                                                               │ DEFAULT      │ -1                 │
 │ resource_request_memory │ Float64                                                                                                                                                                               │ DEFAULT      │ -1                 │
 └─────────────────────────┴───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┴──────────────┴────────────────────┘
+# missing constraint field
 ```
 
+#### collection_events
 ```
-collection_events
 ┌─name───────────────────────┬─type──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┬─default_type─┬─default_expression─┐
 │ time                       │ DateTime('America/Los_Angeles')                                                                                                                                                       │              │                    │
 │ type                       │ Enum8('SUBMIT' = 0, 'QUEUE' = 1, 'ENABLE' = 2, 'SCHEDULE' = 3, 'EVICT' = 4, 'FAIL' = 5, 'FINISH' = 6, 'KILL' = 7, 'LOST' = 8, 'UPDATE_PENDING' = 9, 'UPDATE_RUNNING' = 10)            │              │                    │
@@ -111,8 +112,8 @@ collection_events
 └────────────────────────────┴───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┴──────────────┴────────────────────┘
 ```
 
+#### machine_events
 ```
-machine_events
 ┌─name────────────┬─type───────────────────────────────────────────────────────────────────┬─default_type─┬─default_expression─┐
 │ time            │ DateTime('America/Los_Angeles')                                        │              │                    │
 │ machine_id      │ Int64                                                                  │              │                    │
@@ -124,8 +125,8 @@ machine_events
 └─────────────────┴────────────────────────────────────────────────────────────────────────┴──────────────┴────────────────────┘
 ```
 
+#### machine_attributes
 ```
-machine_attributes
 ┌─name───────┬─type────────────────────────────┬─default_type─┬─default_expression─┐
 │ time       │ DateTime('America/Los_Angeles') │              │                    │
 │ machine_id │ Int64                           │              │                    │
