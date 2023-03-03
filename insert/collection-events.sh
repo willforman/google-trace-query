@@ -32,7 +32,7 @@ clickhouse-client \
     ORDER BY (collection_id, collection_name, collection_logical_name, scheduling_class, priority);
   "
 
-file_name="https://storage.googleapis.com/clusterdata_2019_${cell_id}/collection_events-*.json.gz"
+file_name="https://storage.googleapis.com/clusterdata_2019_${cell_id}/collection_events*.json.gz"
 
 clickhouse-client \
   --port $port \
