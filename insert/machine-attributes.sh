@@ -36,3 +36,11 @@ clickhouse-client \
     deleted
   FROM s3('$file_name', 'Parquet')
   "
+
+clickhouse-client \
+  --port $port \
+  --database trace \
+  --receive_timeout 30000 \
+  --query "
+  OPTIMIZE TABLE $table_name FINAL
+  "

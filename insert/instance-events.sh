@@ -62,3 +62,11 @@ clickhouse-client \
     resource_request['memory']
   FROM s3('$file_name', 'JSONEachRow')
   "
+
+clickhouse-client \
+  --port $port \
+  --database trace \
+  --receive_timeout 30000 \
+  --query "
+  OPTIMIZE TABLE $table_name FINAL
+  "

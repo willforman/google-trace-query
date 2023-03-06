@@ -36,7 +36,7 @@ clickhouse-client \
     ORDER BY (start_time, end_time, collection_id, machine_id, average_usage_cpus, cycles_per_instruction);
   "
 
-  file_name="https://storage.googleapis.com/clusterdata_2019_${cell_id}_parquet/instance_usage000000000000.parquet"
+file_name="https://storage.googleapis.com/clusterdata_2019_${cell_id}_parquet/instance_usage*.parquet"
 
 clickhouse-client \
   --port $port \
@@ -67,4 +67,12 @@ clickhouse-client \
       cpu_usage_distribution,
       tail_cpu_usage_distribution
   FROM s3('$file_name', 'Parquet')
+  "
+
+clickhouse-client \
+  --port $port \
+  --database trace \
+  --receive_timeout 30000 \
+  --query "
+  OPTIMIZE TABLE $table_name FINAL
   "
