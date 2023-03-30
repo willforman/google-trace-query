@@ -5,11 +5,11 @@ It stores the dataset in a [Clickhouse](https://clickhouse.com) database, which 
 
 ### Setup
 
-We will run Clickhouse in Docker. Choose where you want to store all the database files (`var/lib/clickhouse` in the Docker container) on your local machine. This enables:
+We will run Clickhouse in Docker. Choose where you want to store all the data in the database on your local machine. This is done for two reasons:
 - persistence: if the container shuts down we can run the container again with the same files, so we don't have to insert again
 - choosing where you store the data, so you can instead store it on an external drive
 
-The default is `.db` in the root of this repository:
+If you don't care about the second point, then you can store it in this directory under `.db`:
 
 ```
 mkdir .db
@@ -21,26 +21,51 @@ Choose which port you want to expose on your host machine for the database, then
 docker run -d --name google-trace-db -v <path to database dir>:/var/lib/clickhouse -p <db port>:9000 --ulimit nofile=262144:262144 clickhouse/clickhouse-server:22-alpine
 ```
 
+Command breakdown:
+- `docker run clickhouse/clickhouse-server:22-alpine`: run the docker image for clickhouse
+- `-d`: run in detached state, so the database keeps running after you exit your terminal session
+- `--name google-trace-db`: name the container so it's easier to keep track of
+- `-v <path to database dir>:/var/lib/clickhouse`: map some directory on your computer to `var/lib/clickhouse`, which is where the database stores it's files in the container
+  - For example, if you chose to use .db in the project directory, then it would just be `.db:/var/lib/clickhouse`
+- `-p <db port>:9000`: map a port on your machine to port 9000 on the container, which is where the clickhouse server listens on for clients
+- `--ulimit nofile 262144:262144`: [The clickhouse docs](https://hub.docker.com/r/clickhouse/clickhouse-server/) suggests using this flag
+
 To insert data into our database, use `cmd.sh`:
 
 ```
-./cmd.sh --help               
+./cmd.sh --help
 usage: ./cmd.sh <db port> <table name> <cell id>
 
 arguments:
   db port 
   table name:
     - instance-usage
+    - instance-events
+    - collection-events
+    - machine-events
+    - machine-attributes
   cell id: a - h
 ```
 
-To enter a client:
+For example, assuming:
+- the database is listening on port 9010
+- want to insert instance usage table for cell a
+
+```
+./cmd.sh 9010 instance-usage a
+```
+
+To enter a client on the command line:
 
 ```
 docker run -it --rm --network host --entrypoint clickhouse-client clickhouse/clickhouse-server:22-alpine --database trace --port <db port>
 ```
 
+To 
+
 ### Table Schemas
+
+Some columns have defaults of -1. This means that the column is null when it's equal to -1. This was chosen over the `Nullable` type in clickhouse which negatively impacts performance.
 
 #### instance_usage
 ```

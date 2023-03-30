@@ -9,6 +9,10 @@ print_usage() {
   echo "  db port "
   echo "  table name:"
   echo "    - instance-usage"
+  echo "    - instance-events"
+  echo "    - collection-events"
+  echo "    - machine-events"
+  echo "    - machine-attributes"
   echo "  cell id: a - h"
 }
 
