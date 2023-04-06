@@ -65,7 +65,23 @@ docker run -it --rm --network host --entrypoint clickhouse-client clickhouse/cli
 
 ### Usage Tips
 
-If you are interested in having the clickhouse database automatically started when you restart your machine, run:
+#### Find Database Ports
+
+To find what ports your database is listening on on your machine:
+
+```
+$ docker ps
+CONTAINER ID   IMAGE                                    COMMAND                  CREATED          STATUS                    PORTS                                                                                            NAMES
+3423d193ebe2   clickhouse/clickhouse-server:22-alpine   "/entrypoint.sh"         28 seconds ago   Up 26 seconds             0.0.0.0:8123->8123/tcp, :::8123->8123/tcp, 9009/tcp, 0.0.0.0:9076->9000/tcp, :::9076->9000/tcp   google-trace-db
+```
+
+This shows that the docker container has these ports mapped:
+- 8123->8123
+- 9076->9000
+
+#### Automatically Restart Database
+
+If you are interested in having the clickhouse database automatically started if it ever goes down (mainly if you restart your machine):
 
 ```
 docker update --restart unless-stopped google-trace-db
