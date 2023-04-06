@@ -18,7 +18,7 @@ mkdir .db
 Choose which port you want to expose on your host machine for the database, then start it in the background:
 
 ```
-docker run -d --name google-trace-db -v <path to database dir>:/var/lib/clickhouse -p <db port>:9000 --ulimit nofile=262144:262144 clickhouse/clickhouse-server:22-alpine
+docker run -d --name google-trace-db -v <path to database dir>:/var/lib/clickhouse -p <db cli client port>:9000 -p <db python client port>:8123 --ulimit nofile=262144:262144 clickhouse/clickhouse-server:22-alpine
 ```
 
 Command breakdown:
@@ -27,7 +27,9 @@ Command breakdown:
 - `--name google-trace-db`: name the container so it's easier to keep track of
 - `-v <path to database dir>:/var/lib/clickhouse`: map some directory on your computer to `var/lib/clickhouse`, which is where the database stores it's files in the container
   - For example, if you chose to use .db in the project directory, then it would just be `.db:/var/lib/clickhouse`
-- `-p <db port>:9000`: map a port on your machine to port 9000 on the container, which is where the clickhouse server listens on for clients
+- `-p <db cli client port>:9000 -p <db python client port>:8123`: [the ports on your machine that the database will listen on](https://clickhouse.com/docs/en/guides/sre/network-ports):
+  - 9000: used for `clickhouse-client` on the command line
+  - 8123: used for the Python `clickhouse-connect` client, probably the same if using other languages
 - `--ulimit nofile 262144:262144`: [The clickhouse docs](https://hub.docker.com/r/clickhouse/clickhouse-server/) suggests using this flag
 
 To insert data into our database, use `cmd.sh`:
@@ -61,7 +63,13 @@ To enter a client on the command line:
 docker run -it --rm --network host --entrypoint clickhouse-client clickhouse/clickhouse-server:22-alpine --database trace --port <db port>
 ```
 
-To 
+### Usage Tips
+
+If you are interested in having the clickhouse database automatically started when you restart your machine, run:
+
+```
+docker update --restart unless-stopped google-trace-db
+```
 
 ### Table Schemas
 
