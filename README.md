@@ -18,11 +18,12 @@ mkdir .db
 Choose which port you want to expose on your host machine for the database, then start it in the background:
 
 ```
-docker run -d --name google-trace-db -v <path to database dir>:/var/lib/clickhouse -p <db cli client port>:9000 -p <db python client port>:8123 --ulimit nofile=262144:262144 clickhouse/clickhouse-server:22-alpine
+docker run -d --name google-trace-db -v <path to database dir>:/var/lib/clickhouse -p <db cli client port>:9000 -p <db python client port>:8123 --ulimit nofile=262144:262144 clickhouse/clickhouse-server:23.3-alpine
 ```
 
 Command breakdown:
-- `docker run clickhouse/clickhouse-server:22-alpine`: run the docker image for clickhouse
+- `docker run ... clickhouse/clickhouse-server:23.3-alpine`: run [the Clickhouse docker image](https://hub.docker.com/r/clickhouse/clickhouse-server)
+    - note the version specified `23.3` to be safe. you should be able to update to the latest version without rebuilding the database because Clickhouse is generally backwards-compatible
 - `-d`: run in detached state, so the database keeps running after you exit your terminal session
 - `--name google-trace-db`: name the container so it's easier to keep track of
 - `-v <path to database dir>:/var/lib/clickhouse`: map some directory on your computer to `var/lib/clickhouse`, which is where the database stores it's files in the container
@@ -60,7 +61,7 @@ For example, assuming:
 To enter a client on the command line:
 
 ```
-docker run -it --rm --network host --entrypoint clickhouse-client clickhouse/clickhouse-server:22-alpine --database trace --port <db port>
+docker run -it --rm --network host --entrypoint clickhouse-client clickhouse/clickhouse-server:23.3-alpine --database trace --port <db port>
 ```
 
 ### Usage Tips
